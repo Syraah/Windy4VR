@@ -55,7 +55,7 @@ function displayGPXTrace(points) {
 onMount(() => {
     // Windy Plugin initialization
     windyInit({
-        key: 'YOUR_WINDY_API_KEY', // Replace with your Windy API key
+        key: 'ONfrxbUXeQc5YLMBOIaEaIFRt60XRoss', // Replace with your Windy API key
         verbose: true
     }, (windyAPI) => {
         const { map: windyMap } = windyAPI;
