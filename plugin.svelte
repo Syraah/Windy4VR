@@ -101,9 +101,21 @@ function initPlugin() {
     console.log("Plugin initialized and listening for timestamp changes.");
 }
 
+function calculateTWA(wind, boatHeading) {
+    // Calcul de la TWA absolue
+    let TWA = (wind - boatHeading + 360) % 360;
+
+    // Normalisation dans [-180, 180]
+    if (TWA > 180) {
+        TWA -= 360; // Si > 180, le vent est sur bâbord
+    }
+
+    return TWA;
+}
+
 function detectFormat(desc) {
-	const format1 = /COG = ([\d,]+)° SOG = ([\d,]+)nds TWS = ([\d,]+)nds TWA = ([\d,]+)° SAIL = ([\w-]+)/;
-	const format2 = /HDG:(\d+)\s+TWA:([-\d.]+)\s+(.+?)\s+SOG:([\d.]+)\s+kt\s+TWS:([\d.]+)\s+kt/;
+	const format1 = /COG = ([\d,.]+)° SOG = ([\d,.]+)nds TWS = ([\d,.]+)nds TWA = ([\d.,]+)° SAIL = ([\w-]+)/;
+	const format2 = /HDG:(\d+)\s+TWA:([-\d.,]+)\s+(.+?)\s+SOG:([\d.,]+)\s+kt\s+TWS:([\d.,]+)\s+kt/;
     if (format1.test(desc)) {
 	  format = format1;
 	  return 1;
@@ -335,12 +347,12 @@ async function fetchWindData() {
 
                 if (Array.isArray(windData)) {
                     const { dir, wind } = wind2obj(windData);
-
                     // Convert wind speed to user's preferred units
                     const windSpeed = metrics.wind.convertValue(wind, " ");
                     const windDir = dir;
+					const TWA = calculateTWA(dir, closestWaypoint.COG);
 
-                    windDatas.push({ windSpeed, windDir });
+                    windDatas.push({ windSpeed, windDir, TWA });
                 } else {
                     console.error("Invalid wind data:", windData);
                 }
@@ -481,8 +493,9 @@ td div {
       <thead>
         <tr>
           <th>Route</th>
-          <th>Wind Speed</th>
-		  <th>Wind Direction</th>
+          <th>TWS</th>
+		  <th>TWD</th>
+		  <th>TWA</th>
         </tr>
       </thead>
       <tbody>
@@ -498,6 +511,9 @@ td div {
 			<td>
               {#if !isLoading}{windata.windDir}° {/if}
             </td>
+			<td>
+              {#if !isLoading}{windata.TWA}° {/if}
+            </td>
           </tr>
         {/each}
 	
@@ -506,19 +522,47 @@ td div {
   {/if}
   
 {#if fileSelected}
-	{#if !isZezo && filesNumbers == 1 }
 <!-- Display selected waypoint details -->
-      <div class="details">
-        <h3>GPX Waypoint details</h3>
-		{#each closestWaypoints as closestWaypoint}
-			<p><span>HDG:</span> {closestWaypoint.COG || "N/A"}°</p>
-			<p><span>Speed:</span> {closestWaypoint.SOG || "N/A"} nds</p>
-			<p><span>TWS:</span> {closestWaypoint.TWS || "N/A"} nds</p>
-			<p><span>TWA:</span> {closestWaypoint.TWA || "N/A"}°</p>
-			<p><span>Sail:</span> {closestWaypoint.SAIL || "N/A"}</p>
-		{/each}
-      </div>
-	{/if}
+
+    <h3>GPX Waypoint details</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>HDG</th>
+		  <th>Speed</th>
+		  <th>TWS</th>
+		  <th>TWA</th>
+		  <th>Sail</th>
+        </tr>
+      </thead>
+      <tbody>
+	  
+        {#each closestWaypoints as closestWaypoint, index}
+          <tr>
+            <td>
+              <div style="width: 20px; height: 20px; background-color: {colors[index]}"></div>
+            </td>
+			<td>
+				{closestWaypoint.COG || "N/A"}°
+            </td>
+			<td>
+              {closestWaypoint.SOG || "N/A"} nds
+            </td>
+			<td>
+              {closestWaypoint.TWS || "N/A"} nds
+            </td>
+			<td>
+              {closestWaypoint.TWA || "N/A"}°
+            </td>
+			<td>
+              {closestWaypoint.SAIL || "N/A"}
+            </td>
+          </tr>
+        {/each}
+	
+      </tbody>
+    </table>
 	<button class="reset-button" on:click={clearData}>Réinitialiser</button>
 {/if}
 </section>
