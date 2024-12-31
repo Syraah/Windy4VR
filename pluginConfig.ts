@@ -2,15 +2,15 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-windy4vr',
-    version: '1.0.0',
+    version: '1.0.1',
     title: 'Windy4VR',
-    icon: '⛵',
+    icon: '🥕',
     description: 'Plugin windy pour visualiser son routage virtuel',
     author: 'Syraah',
     repository: 'https://github.com/Syraah/Windy4VR',
     desktopUI: 'rhpane',
 	mobileUI: 'small',
-	desktopWidth: 300,
+	desktopWidth: 400,
     routerPath: '/windy4vr',
 };
 
