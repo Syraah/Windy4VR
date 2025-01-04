@@ -1,6 +1,6 @@
 const __pluginConfig =  {
   "name": "windy-plugin-windy4vr",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "title": "Windy4VR",
   "icon": "🥕",
   "description": "Plugin windy pour visualiser son routage virtuel",
@@ -10,8 +10,8 @@ const __pluginConfig =  {
   "mobileUI": "small",
   "desktopWidth": 400,
   "routerPath": "/windy4vr",
-  "built": 1736009018459,
-  "builtReadable": "2025-01-04T16:43:38.459Z"
+  "built": 1736010436924,
+  "builtReadable": "2025-01-04T17:07:16.924Z"
 };
 
 // transformCode: import { map } from '@windy/map';
@@ -682,50 +682,8 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (821:0) {#if !fileSelected}
-function create_if_block_4(ctx) {
-	let p;
-	let t1;
-	let input;
-	let mounted;
-	let dispose;
-
-	return {
-		c() {
-			p = element("p");
-			p.textContent = "Sélectionnez un(des) fichier(s) GPX pour afficher la trace sur la map.";
-			t1 = space();
-			input = element("input");
-			attr(input, "type", "file");
-			attr(input, "accept", ".gpx,.csv");
-			input.multiple = true;
-		},
-		m(target, anchor) {
-			insert(target, p, anchor);
-			insert(target, t1, anchor);
-			insert(target, input, anchor);
-
-			if (!mounted) {
-				dispose = listen(input, "change", /*handleFileUpload*/ ctx[5]);
-				mounted = true;
-			}
-		},
-		p: noop,
-		d(detaching) {
-			if (detaching) {
-				detach(p);
-				detach(t1);
-				detach(input);
-			}
-
-			mounted = false;
-			dispose();
-		}
-	};
-}
-
-// (831:0) {#if routes.length > 0}
-function create_if_block(ctx) {
+// (822:0) {#if routes.length > 0}
+function create_if_block_2(ctx) {
 	let h30;
 	let t1;
 	let table0;
@@ -740,21 +698,7 @@ function create_if_block(ctx) {
 	let t25;
 	let tbody1;
 	let t26;
-	let br0;
-	let t27;
-	let label0;
-	let button;
-	let t29;
-	let t30;
-	let input0;
-	let t31;
-	let label1;
-	let br1;
-	let input1;
-	let t32;
-	let br2;
-	let mounted;
-	let dispose;
+	let br;
 	let each_value_1 = ensure_array_like(/*windDatas*/ ctx[4]);
 	let each_blocks_1 = [];
 
@@ -799,31 +743,9 @@ function create_if_block(ctx) {
 			}
 
 			t26 = space();
-			br0 = element("br");
-			t27 = space();
-			label0 = element("label");
-			button = element("button");
-			button.textContent = "+";
-			t29 = text("\r\n\t\tAjouter une route");
-			t30 = space();
-			input0 = element("input");
-			t31 = space();
-			label1 = element("label");
-			br1 = element("br");
-			input1 = element("input");
-			t32 = text(" Zones d'exclusion VG2024");
-			br2 = element("br");
+			br = element("br");
 			attr(table0, "class", "svelte-xsvoth");
 			attr(table1, "class", "svelte-xsvoth");
-			attr(button, "class", "add-button svelte-xsvoth");
-			attr(button, "id", "addFileButton");
-			attr(input0, "type", "file");
-			attr(input0, "id", "fileInput");
-			attr(input0, "accept", ".csv,.gpx");
-			set_style(input0, "display", "none");
-			input0.multiple = true;
-			attr(input1, "class", "ZE svelte-xsvoth");
-			attr(input1, "type", "checkbox");
 		},
 		m(target, anchor) {
 			insert(target, h30, anchor);
@@ -854,29 +776,7 @@ function create_if_block(ctx) {
 			}
 
 			insert(target, t26, anchor);
-			insert(target, br0, anchor);
-			insert(target, t27, anchor);
-			insert(target, label0, anchor);
-			append(label0, button);
-			append(label0, t29);
-			insert(target, t30, anchor);
-			insert(target, input0, anchor);
-			insert(target, t31, anchor);
-			insert(target, label1, anchor);
-			append(label1, br1);
-			append(label1, input1);
-			append(label1, t32);
-			append(label1, br2);
-
-			if (!mounted) {
-				dispose = [
-					listen(button, "click", /*click_handler_1*/ ctx[9]),
-					listen(input0, "change", /*handleFileUpload*/ ctx[5]),
-					listen(input1, "click", /*toggleZE*/ ctx[7])
-				];
-
-				mounted = true;
-			}
+			insert(target, br, anchor);
 		},
 		p(ctx, dirty) {
 			if (dirty[0] & /*deleteRoute, windDatas, isLoading, routes*/ 85) {
@@ -935,25 +835,17 @@ function create_if_block(ctx) {
 				detach(t13);
 				detach(table1);
 				detach(t26);
-				detach(br0);
-				detach(t27);
-				detach(label0);
-				detach(t30);
-				detach(input0);
-				detach(t31);
-				detach(label1);
+				detach(br);
 			}
 
 			destroy_each(each_blocks_1, detaching);
 			destroy_each(each_blocks, detaching);
-			mounted = false;
-			run_all(dispose);
 		}
 	};
 }
 
-// (851:4) {#if !isLoading}
-function create_if_block_3(ctx) {
+// (842:4) {#if !isLoading}
+function create_if_block_5(ctx) {
 	let t_value = /*windata*/ ctx[44].windSpeed + "";
 	let t;
 
@@ -975,8 +867,8 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (854:4) {#if !isLoading}
-function create_if_block_2(ctx) {
+// (845:4) {#if !isLoading}
+function create_if_block_4(ctx) {
 	let t0_value = /*windata*/ ctx[44].windDir + "";
 	let t0;
 	let t1;
@@ -1002,8 +894,8 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (857:4) {#if !isLoading}
-function create_if_block_1(ctx) {
+// (848:4) {#if !isLoading}
+function create_if_block_3(ctx) {
 	let t0_value = /*windata*/ ctx[44].TWA + "";
 	let t0;
 	let t1;
@@ -1029,7 +921,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (845:8) {#each windDatas as windata, index}
+// (836:8) {#each windDatas as windata, index}
 function create_each_block_1(ctx) {
 	let tr;
 	let td0;
@@ -1047,9 +939,9 @@ function create_each_block_1(ctx) {
 	let t5;
 	let mounted;
 	let dispose;
-	let if_block0 = !/*isLoading*/ ctx[2] && create_if_block_3(ctx);
-	let if_block1 = !/*isLoading*/ ctx[2] && create_if_block_2(ctx);
-	let if_block2 = !/*isLoading*/ ctx[2] && create_if_block_1(ctx);
+	let if_block0 = !/*isLoading*/ ctx[2] && create_if_block_5(ctx);
+	let if_block1 = !/*isLoading*/ ctx[2] && create_if_block_4(ctx);
+	let if_block2 = !/*isLoading*/ ctx[2] && create_if_block_3(ctx);
 
 	function click_handler() {
 		return /*click_handler*/ ctx[8](/*index*/ ctx[43]);
@@ -1126,7 +1018,7 @@ function create_each_block_1(ctx) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_3(ctx);
+					if_block0 = create_if_block_5(ctx);
 					if_block0.c();
 					if_block0.m(td1, null);
 				}
@@ -1139,7 +1031,7 @@ function create_each_block_1(ctx) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_2(ctx);
+					if_block1 = create_if_block_4(ctx);
 					if_block1.c();
 					if_block1.m(td2, null);
 				}
@@ -1152,7 +1044,7 @@ function create_each_block_1(ctx) {
 				if (if_block2) {
 					if_block2.p(ctx, dirty);
 				} else {
-					if_block2 = create_if_block_1(ctx);
+					if_block2 = create_if_block_3(ctx);
 					if_block2.c();
 					if_block2.m(td3, null);
 				}
@@ -1175,7 +1067,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (884:8) {#each closestWaypoints as closestWaypoint, index}
+// (875:8) {#each closestWaypoints as closestWaypoint, index}
 function create_each_block(ctx) {
 	let tr;
 	let td0;
@@ -1292,13 +1184,123 @@ function create_each_block(ctx) {
 	};
 }
 
+// (902:0) {#if !fileSelected}
+function create_if_block_1(ctx) {
+	let p;
+
+	return {
+		c() {
+			p = element("p");
+			p.textContent = "Sélectionnez un(des) fichier(s) pour afficher la trace sur la map.";
+		},
+		m(target, anchor) {
+			insert(target, p, anchor);
+		},
+		d(detaching) {
+			if (detaching) {
+				detach(p);
+			}
+		}
+	};
+}
+
+// (912:0) {:else}
+function create_else_block(ctx) {
+	let br0;
+	let t0;
+	let label;
+	let br1;
+	let input;
+	let t1;
+	let br2;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			br0 = element("br");
+			t0 = space();
+			label = element("label");
+			br1 = element("br");
+			input = element("input");
+			t1 = text(" Zones d'exclusion VG2024");
+			br2 = element("br");
+			attr(input, "class", "ZE svelte-xsvoth");
+			attr(input, "type", "checkbox");
+		},
+		m(target, anchor) {
+			insert(target, br0, anchor);
+			insert(target, t0, anchor);
+			insert(target, label, anchor);
+			append(label, br1);
+			append(label, input);
+			append(label, t1);
+			append(label, br2);
+
+			if (!mounted) {
+				dispose = listen(input, "click", /*toggleZE*/ ctx[7]);
+				mounted = true;
+			}
+		},
+		p: noop,
+		d(detaching) {
+			if (detaching) {
+				detach(br0);
+				detach(t0);
+				detach(label);
+			}
+
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+// (910:0) {#if !fileSelected}
+function create_if_block(ctx) {
+	let p;
+
+	return {
+		c() {
+			p = element("p");
+			p.textContent = "Formats supportés: Avalon, Dorado, QTVLM, VRZen, Zezo";
+		},
+		m(target, anchor) {
+			insert(target, p, anchor);
+		},
+		p: noop,
+		d(detaching) {
+			if (detaching) {
+				detach(p);
+			}
+		}
+	};
+}
+
 function create_fragment(ctx) {
 	let section;
 	let div;
 	let t1;
 	let t2;
-	let if_block0 = !/*fileSelected*/ ctx[3] && create_if_block_4(ctx);
-	let if_block1 = /*routes*/ ctx[0].length > 0 && create_if_block(ctx);
+	let t3;
+	let label;
+	let button;
+	let t5;
+	let t6;
+	let input;
+	let t7;
+	let mounted;
+	let dispose;
+	let if_block0 = /*routes*/ ctx[0].length > 0 && create_if_block_2(ctx);
+	let if_block1 = !/*fileSelected*/ ctx[3] && create_if_block_1();
+
+	function select_block_type(ctx, dirty) {
+		if (!/*fileSelected*/ ctx[3]) return create_if_block;
+		return create_else_block;
+	}
+
+	let current_block_type = select_block_type(ctx);
+	let if_block2 = current_block_type(ctx);
 
 	return {
 		c() {
@@ -1309,7 +1311,23 @@ function create_fragment(ctx) {
 			if (if_block0) if_block0.c();
 			t2 = space();
 			if (if_block1) if_block1.c();
+			t3 = space();
+			label = element("label");
+			button = element("button");
+			button.textContent = "+";
+			t5 = text("\r\n\t\tAjouter une route");
+			t6 = space();
+			input = element("input");
+			t7 = space();
+			if_block2.c();
 			attr(div, "class", "plugin__title");
+			attr(button, "class", "add-button svelte-xsvoth");
+			attr(button, "id", "addFileButton");
+			attr(input, "type", "file");
+			attr(input, "id", "fileInput");
+			attr(input, "accept", ".csv,.gpx");
+			set_style(input, "display", "none");
+			input.multiple = true;
 			attr(section, "class", "plugin__content");
 		},
 		m(target, anchor) {
@@ -1319,13 +1337,30 @@ function create_fragment(ctx) {
 			if (if_block0) if_block0.m(section, null);
 			append(section, t2);
 			if (if_block1) if_block1.m(section, null);
+			append(section, t3);
+			append(section, label);
+			append(label, button);
+			append(label, t5);
+			append(section, t6);
+			append(section, input);
+			append(section, t7);
+			if_block2.m(section, null);
+
+			if (!mounted) {
+				dispose = [
+					listen(button, "click", /*click_handler_1*/ ctx[9]),
+					listen(input, "change", /*handleFileUpload*/ ctx[5])
+				];
+
+				mounted = true;
+			}
 		},
 		p(ctx, dirty) {
-			if (!/*fileSelected*/ ctx[3]) {
+			if (/*routes*/ ctx[0].length > 0) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_4(ctx);
+					if_block0 = create_if_block_2(ctx);
 					if_block0.c();
 					if_block0.m(section, t2);
 				}
@@ -1334,17 +1369,27 @@ function create_fragment(ctx) {
 				if_block0 = null;
 			}
 
-			if (/*routes*/ ctx[0].length > 0) {
-				if (if_block1) {
-					if_block1.p(ctx, dirty);
-				} else {
-					if_block1 = create_if_block(ctx);
+			if (!/*fileSelected*/ ctx[3]) {
+				if (if_block1) ; else {
+					if_block1 = create_if_block_1();
 					if_block1.c();
-					if_block1.m(section, null);
+					if_block1.m(section, t3);
 				}
 			} else if (if_block1) {
 				if_block1.d(1);
 				if_block1 = null;
+			}
+
+			if (current_block_type === (current_block_type = select_block_type(ctx)) && if_block2) {
+				if_block2.p(ctx, dirty);
+			} else {
+				if_block2.d(1);
+				if_block2 = current_block_type(ctx);
+
+				if (if_block2) {
+					if_block2.c();
+					if_block2.m(section, null);
+				}
 			}
 		},
 		i: noop,
@@ -1356,6 +1401,9 @@ function create_fragment(ctx) {
 
 			if (if_block0) if_block0.d();
 			if (if_block1) if_block1.d();
+			if_block2.d();
+			mounted = false;
+			run_all(dispose);
 		}
 	};
 }
@@ -1664,6 +1712,8 @@ function instance($$self, $$props, $$invalidate) {
 
 		for (const file of files) {
 			if (filesList.indexOf(file.name) == -1) {
+				filesList.push(file.name);
+
 				try {
 					const fileExtension = file.name.split('.').pop().toLowerCase();
 					hue = (hue + 60) % 360;
@@ -1690,8 +1740,6 @@ function instance($$self, $$props, $$invalidate) {
 							color
 						}
 					]);
-
-					filesList.push(file.name);
 				} catch(err) {
 					console.error('Error reading file:', err);
 				}

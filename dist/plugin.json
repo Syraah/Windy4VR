@@ -1,6 +1,6 @@
 {
   "name": "windy-plugin-windy4vr",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "title": "Windy4VR",
   "icon": "🥕",
   "description": "Plugin windy pour visualiser son routage virtuel",
@@ -10,6 +10,9 @@
   "mobileUI": "small",
   "desktopWidth": 400,
   "routerPath": "/windy4vr",
-  "built": 1736009018475,
-  "builtReadable": "2025-01-04T16:43:38.475Z"
+  "built": 1736010436956,
+  "builtReadable": "2025-01-04T17:07:16.956Z",
+  "repositoryName": "https://github.com/Syraah/Windy4VR",
+  "commitSha": "4a6a0de",
+  "repositoryOwner": "Syraah"
 }

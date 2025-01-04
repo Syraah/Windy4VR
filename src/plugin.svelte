@@ -259,6 +259,7 @@ async function handleFileUpload(event) {
 	
 	for (const file of files) {
 		if (filesList.indexOf(file.name) == -1) {
+		  filesList.push(file.name);
 		  try {
 			const fileExtension = file.name.split('.').pop().toLowerCase();
 			hue = (hue + 60) % 360;
@@ -286,7 +287,6 @@ async function handleFileUpload(event) {
 				color
 			  },
 			];
-		  filesList.push(file.name);
 		  } catch (err) {
 			console.error('Error reading file:', err);
 		  }
@@ -948,15 +948,6 @@ td div {
 
 <section class="plugin__content">
     <div class="plugin__title">Windy4VR</div>
-{#if !fileSelected}
-<p>Sélectionnez un(des) fichier(s) GPX pour afficher la trace sur la map.</p>
-    <input
-      type="file"
-	  accept=".gpx,.csv"
-      multiple
-      on:change={handleFileUpload}
-    />
-{/if}
 	
 {#if routes.length > 0}
 <h3>Windy Data:</h3>
@@ -1036,14 +1027,20 @@ td div {
 	
       </tbody>
     </table>
-	
-    <br/>
+	<br/>
+{/if}
+{#if !fileSelected}
+<p>Sélectionnez un(des) fichier(s) pour afficher la trace sur la map.</p>
+{/if}
 	<label>
 		<button class="add-button" id="addFileButton" on:click={() => document.getElementById('fileInput').click()}>+</button>
 		Ajouter une route
 	</label>
     <input type="file" id="fileInput" accept=".csv,.gpx" style="display: none;" multiple on:change={handleFileUpload}/>
-	
+{#if !fileSelected}
+	<p>Formats supportés: Avalon, Dorado, QTVLM, VRZen, Zezo</p>
+{:else}
+<br/>
 	<label>
 		<br/><input class="ZE" type="checkbox" on:click={toggleZE}> Zones d'exclusion VG2024<br/>
 	</label>
