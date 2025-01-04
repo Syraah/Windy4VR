@@ -10,14 +10,12 @@ import broadcast from '@windy/broadcast';
 //import { zonesInterdites } from './exclusionsVG24';
 
 
-let gpxFiles = [];
 let routes = [];
 let routesWP = [];
 let gpsData; // Parsed GPX data
 let gpxFile = null; // Contiendra le fichier GPX
 let closestWaypoints = []; // Stockera les coordonnées extraites
 let gpxContent = ""; // Contenu du fichier GPX chargé
-let data = [];
 let markers = [];
 let isLoading = false; // Indicateur de chargement
 let current_time = new Date(store.get("timestamp")).toLocaleString();
@@ -26,13 +24,15 @@ let polylines = [];
 let windDatas = [];
 let windSpeed = null;
 let windDir = null;
-let isZezo = false;
 let format = null;
+let filesList = [];
 let filesNumbers = 0;
 let colors = [];
 let ZE = [];
 let CSVformat = "";
 let isShowZE = false;
+let hue = 0;
+
 const normal_icon = `<svg  viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.784,13.635c0,0 -0.106,-2.924 0.006,-4.379c0.115,-1.502 0.318,-3.151 0.686,-4.632c0.163,-0.654 0.45,-1.623 0.755,-2.44c0.202,-0.54 0.407,-1.021 0.554,-1.352c0.038,-0.085 0.122,-0.139 0.215,-0.139c0.092,0 0.176,0.054 0.214,0.139c0.151,0.342 0.361,0.835 0.555,1.352c0.305,0.817 0.592,1.786 0.755,2.44c0.368,1.481 0.571,3.13 0.686,4.632c0.112,1.455 0.006,4.379 0.006,4.379l-4.432,0Z" style="fill:#000;"/><path d="M5.481,12.731c0,0 -0.073,-3.048 0.003,-4.22c0.06,-0.909 0.886,-3.522 1.293,-4.764c0.03,-0.098 0.121,-0.165 0.223,-0.165c0.103,0 0.193,0.067 0.224,0.164c0.406,1.243 1.232,3.856 1.292,4.765c0.076,1.172 0.003,4.22 0.003,4.22l-3.038,0Z" style="fill:#fff;fill-opacity:0.846008;"/></svg>`;
 
 const carrot_icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-23.6626 -11.6643 10.13 31.78" width="12px" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -256,33 +256,43 @@ async function handleFileUpload(event) {
 	fileSelected = true;
 	filesNumbers = files.length;
 	
-	for (const file of files) {
-      try {
-		const fileExtension = file.name.split('.').pop().toLowerCase();
-	    var waypoints = [];
-		// Vérifier le type de fichier et appeler la fonction appropriée
-            if (fileExtension === 'csv') {
-				const content = await readCSV(file);
-                waypoints = await parseCSV(content);
-            } else if (fileExtension === 'gpx') {
-                const content = await readGPX(file);
-				waypoints = parseGpx(content);
-            } else {
-                console.error('Unsupported file type:', file.name);
-                alert('Type de fichier non pris en charge. Veuillez charger un fichier .csv ou .gpx.');
-            }
 	
-        // Ajouter la nouvelle route et réassigner `routes`
-        routes = [
-          ...routes,
-          {
-            fileName: file.name,
-            waypoints
-          },
-        ];
-      } catch (err) {
-        console.error('Error reading file:', err);
-      }
+	for (const file of files) {
+		if (filesList.indexOf(file.name) == -1) {
+		  try {
+			const fileExtension = file.name.split('.').pop().toLowerCase();
+			hue = (hue + 60) % 360;
+			const color = `hsl(${hue}, 100%, 45%)`;
+			var waypoints = [];
+			// Vérifier le type de fichier et appeler la fonction appropriée
+				if (fileExtension === 'csv') {
+					const content = await readCSV(file);
+					waypoints = await parseCSV(content);
+				} else if (fileExtension === 'gpx') {
+					const content = await readGPX(file);
+					waypoints = parseGpx(content);
+				} else {
+					console.error('Unsupported file type:', file.name);
+					alert('Type de fichier non pris en charge. Veuillez charger un fichier .csv ou .gpx.');
+				}
+		
+			// Ajouter la nouvelle route et réassigner `routes`
+			routes = [
+			  ...routes,
+			  {
+				fileName: file.name,
+				waypoints,
+				ploted: false,
+				color
+			  },
+			];
+		  filesList.push(file.name);
+		  } catch (err) {
+			console.error('Error reading file:', err);
+		  }
+		} else {
+            alert(`Le fichier "${file.name}" est déjà présent.`);
+        }
     }
 	plotGpsData();
 	const date = new Date(store.get("timestamp"));
@@ -433,7 +443,6 @@ function parseGpx(gpxString) {
 	
 	
 	if (wptNodes.length == 0) {
-		isZezo = true;
 		// Tableau pour stocker les données extraites
 		const rteptData = [];
 		// Parcourir chaque balise <wpt>
@@ -509,6 +518,17 @@ function parseGpx(gpxString) {
         });
 		}
     });
+	// calcul du COG si non présent dans le GPX
+	for (let i = 0; i < wptData.length-1; i++) {
+			var WP = wptData[i];
+			if (WP.COG == 0) {
+				var nextWP = wptData[i+1];
+				var COG = calculateBearing(WP.lat, WP.lon, nextWP.lat, nextWP.lon);
+				wptData[i].COG = COG;
+				console.log(COG);
+			}
+		}
+		wptData[wptData.length-1].COG = wptData[wptData.length-2].COG;
 	return wptData;
 	}
 }
@@ -609,53 +629,55 @@ function calculateBearing(lat1, lon1, lat2, lon2) {
 
 // Afficher le tracé GPS sur la carte
 function plotGpsData() {
-	let hue = 0;
-	routes.forEach((route_data)  => {	
-	const route = route_data.waypoints;
-	//});
-    const latlngs = route.map(point => [point.lat, point.lon]);
-	hue = (hue + 60) % 360;
-	const color = `hsl(${hue}, 100%, 45%)`;
-	colors.push(color);
-	// Ajouter les traces sur la carte Windy
-    const polyline = L.polyline(latlngs, { color , weight: 2, opacity: 0.5 }).addTo(map);
-	polylines.push(polyline);
-	// Ajouter les points sur la carte Windy
-	
-	route.forEach((WP) => {
-		const WPTimestamp = WP.time.getTime();
-		const markerWP = new L.marker([WP.lat,parseFloat(WP.lon) >0 ? (parseFloat(WP.lon) % 360) - 360 : parseFloat(WP.lon)], {
-          icon: L.divIcon({
-			className: 'marker-icon',
-			html: `<div><svg width="4" height="4" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="2" fill="${color}" stroke-width="0"/></svg></div>`,
-			iconSize: [4, 4],
-			iconAnchor: [2, 12],
-			opacity: 1
-		}),});
-		markerWP.on('click', () => store.set("timestamp",WPTimestamp));
-		markerWP.addTo(map);
-		routesWP.push(markerWP);
+	var i = 0;
+	routes.forEach((route_data, index)  => {
+		if (!route_data.ploted) {
+			const route = route_data.waypoints;
+			const color = route_data.color;
+			//});
+			const latlngs = route.map(point => [point.lat, point.lon]);
+
+			// Ajouter les traces sur la carte Windy
+			const polyline = L.polyline(latlngs, { color , weight: 2, opacity: 0.5 }).addTo(map);
+			polylines.push(polyline);
+			// Ajouter les points sur la carte Windy
+			
+			route.forEach((WP) => {
+				const WPTimestamp = WP.time.getTime();
+				const markerWP = new L.marker([WP.lat,parseFloat(WP.lon) >0 ? (parseFloat(WP.lon) % 360) - 360 : parseFloat(WP.lon)], {
+				  icon: L.divIcon({
+					className: 'marker-icon',
+					html: `<div><svg width="4" height="4" version="1.1" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="2" fill="${color}" stroke-width="0"/></svg></div>`,
+					iconSize: [4, 4],
+					iconAnchor: [2, 12],
+					opacity: 1
+				}),});
+				markerWP.on('click', () => store.set("timestamp",WPTimestamp));
+				markerWP.addTo(map);
+				routesWP.push({markerWP,i});
+			});
+			// Ajouter un marker à la première position
+			  const firstWaypoint = route[0];
+			  closestWaypoints.push(firstWaypoint);
+				const marker = new L.marker([firstWaypoint.lat,parseFloat(firstWaypoint.lon) >0 ? (parseFloat(firstWaypoint.lon) % 360) - 360 : parseFloat(firstWaypoint.lon)], {
+				  icon: L.divIcon({
+					className: 'marker-icon',
+					html: `<div style="transform: rotate(${firstWaypoint.COG}deg);">${currentIcon}</div>`,
+					iconSize: [24, 24],
+					iconAnchor: [12, 12],
+				  }),
+				});
+				marker.on('click', () => changeIcon());
+				marker.addTo(map);
+			markers.push(marker);
+			// Centrer la carte sur les données
+			map.fitBounds(polyline.getBounds());
+			//Récupérer les données de Windy
+			fetchWindData();
+		routes[index].ploted = true;
+		};
+		i++;
 	});
-	// Ajouter un marker à la première position
-      const firstWaypoint = route[0];
-	  closestWaypoints.push(firstWaypoint);
-		const marker = new L.marker([firstWaypoint.lat,parseFloat(firstWaypoint.lon) >0 ? (parseFloat(firstWaypoint.lon) % 360) - 360 : parseFloat(firstWaypoint.lon)], {
-          icon: L.divIcon({
-			className: 'marker-icon',
-            html: `<div style="transform: rotate(${firstWaypoint.COG}deg);">${currentIcon}</div>`,
-			iconSize: [24, 24],
-			iconAnchor: [12, 12],
-          }),
-        });
-		marker.on('click', () => changeIcon());
-		marker.addTo(map);
-	markers.push(marker);
-    // Centrer la carte sur les données
-    map.fitBounds(polyline.getBounds());
-	//Récupérer les données de Windy
-	fetchWindData();
-	});
-	//alert("fini");
 }
 
 // Fonction pour changer d'icone
@@ -686,7 +708,6 @@ function syncMarkerWithForecast(forecastTime) {
 	  }));
 	  i++;
 	}});
-	//fetchWindData();
 }
 
 // Fonction pour récupérer et afficher les données
@@ -734,7 +755,45 @@ async function fetchWindData() {
         broadcast.off(listener);
     });
 }
- 
+
+//Supprime une route
+function deleteRoute(routeIndex) {
+	console.log("Deleting route ",routeIndex);
+	if (polylines.length > 1) {
+		//Supression des éléments affichés sur la map
+		map.removeLayer(polylines[routeIndex]);
+		map.removeLayer(markers[routeIndex]);
+		map.removeLayer(routesWP[routeIndex]);
+		routesWP.forEach((WP) => {
+			if (WP.i == routeIndex) {
+				map.removeLayer(WP.markerWP);
+			}
+		});
+		
+		//Supression des données de la route
+		routes.splice(routeIndex, 1);
+		closestWaypoints.splice(routeIndex, 1);
+		polylines.splice(routeIndex, 1);
+		markers.splice(routeIndex, 1);
+		windDatas.splice(routeIndex, 1);
+		colors.splice(routeIndex, 1);
+		routesWP.splice(routeIndex, 1);
+		filesList.splice(routeIndex, 1);
+		for (let j = routesWP.length - 1; j >=0; j--) {
+			if (routesWP[j].i == routeIndex) {
+				routesWP.splice(j, 1);
+			} else if (routesWP[j].i > routeIndex) {
+				routesWP[j].i--;
+			}
+		};
+		//fetchWindData()
+		routes = [...routes];
+	} else {		
+		clearData();
+	}
+	
+}	
+
 // Clear all GPX data and reset the map
 function clearData() {
 	polylines.forEach((polyline) => {
@@ -746,15 +805,13 @@ function clearData() {
     });
 	
 	routesWP.forEach((WP) => {
-        map.removeLayer(WP);
+        map.removeLayer(WP.markerWP);
     });
 	
 	fileSelected = false;
-	isZezo = false;
-	gpxFiles = [];
+	filesList = [];
 	routes = [];
 	closestWaypoints = []; 
-	data = [];
 	polylines = [];
 	markers = [];
 	isLoading = false; // Indicateur de chargement
@@ -797,15 +854,7 @@ if (typeof W !== "undefined" && typeof store !== "undefined") {
 </script>
 
 <style>
-  .details {
-    margin-top: 0px;
-    font-size: 12px;
-  }
 
-  .details span {
-    font-weight: bold;
-  }
-  
  .ZE {
 	margin-top: 20px;
   }
@@ -845,6 +894,55 @@ td div {
   display: inline-block;
   border: 1px solid #000;
 }
+
+.add-button {
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background-color: #f4f4f4;
+	color: #0056b3;
+	font-size: 24px;
+	font-weight: bold;
+	text-align: center;
+	line-height: 20px;
+	cursor: pointer;
+	border: none;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.add-button:hover {
+	background-color: #0056b3;
+	color: white;
+}
+
+.delete-button {
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background-color: transparent;
+	color: #e63939;
+	font-size: 24px;
+	text-align: center;
+	line-height: 20px;
+	cursor: pointer;
+	border: none;
+}
+
+.delete-button:hover {
+	background-color: #e63939;
+	color: #f4f4f4;
+	font-weight: bold;
+}
+
+.delete-cell {
+	border: none; 
+	text-align: center; 
+	padding: 0;
+	background-color: transparent;
+}
+
 </style>
 
 
@@ -859,7 +957,7 @@ td div {
       on:change={handleFileUpload}
     />
 {/if}
-
+	
 {#if routes.length > 0}
 <h3>Windy Data:</h3>
     <table>
@@ -869,6 +967,7 @@ td div {
           <th>TWS</th>
 		  <th>TWD</th>
 		  <th>TWA</th>
+		  <th class="delete-cell"></th>
         </tr>
       </thead>
       <tbody>
@@ -876,25 +975,26 @@ td div {
         {#each windDatas as windata, index}
           <tr>
             <td>
-              <div style="width: 20px; height: 20px; background-color: {colors[index]}" title="{routes[index].fileName}"></div>
+              <div style="width: 20px; height: 20px; background-color: {routes[index].color}" title="{routes[index].fileName}"></div>
             </td>
 			<td>
 				{#if !isLoading}{windata.windSpeed}{/if}
             </td>
 			<td>
-              {#if !isLoading}{windata.windDir}° {/if}
+				{#if !isLoading}{windata.windDir}° {/if}
             </td>
 			<td>
-              {#if !isLoading}{windata.TWA}° {/if}
+				{#if !isLoading}{windata.TWA}° {/if}
             </td>
+			<td class="delete-cell">
+				<button class="delete-button" id="deletefile" title="Supprimer la route" on:click={() => deleteRoute(index)}>–</button>
+			</td>
           </tr>
         {/each}
 	
       </tbody>
     </table>
-  {/if}
-  
-{#if fileSelected}
+
 <!-- Display selected waypoint details -->
 
     <h3>GPX Waypoint details</h3>
@@ -914,7 +1014,7 @@ td div {
         {#each closestWaypoints as closestWaypoint, index}
           <tr>
             <td>
-              <div style="width: 20px; height: 20px; background-color: {colors[index]}" title="{routes[index].fileName}"></div>
+              <div style="width: 20px; height: 20px; background-color: {routes[index].color}" title="{routes[index].fileName}"></div>
             </td>
 			<td>
 				{closestWaypoint.COG || "N/A"}°
@@ -936,9 +1036,16 @@ td div {
 	
       </tbody>
     </table>
+	
+    <br/>
 	<label>
-		<input class="ZE" type="checkbox" on:click={toggleZE}> Zones d'exclusion VG2024<br/>
+		<button class="add-button" id="addFileButton" on:click={() => document.getElementById('fileInput').click()}>+</button>
+		Ajouter une route
 	</label>
-	<button class="reset-button" on:click={clearData}>Réinitialiser</button>
+    <input type="file" id="fileInput" accept=".csv,.gpx" style="display: none;" multiple on:change={handleFileUpload}/>
+	
+	<label>
+		<br/><input class="ZE" type="checkbox" on:click={toggleZE}> Zones d'exclusion VG2024<br/>
+	</label>
 {/if}
 </section>

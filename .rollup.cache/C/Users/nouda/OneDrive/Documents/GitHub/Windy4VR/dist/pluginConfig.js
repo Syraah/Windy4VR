@@ -1,6 +1,6 @@
 const config = {
     name: 'windy-plugin-windy4vr',
-    version: '1.0.6',
+    version: '1.0.7',
     title: 'Windy4VR',
     icon: '🥕',
     description: 'Plugin windy pour visualiser son routage virtuel',
