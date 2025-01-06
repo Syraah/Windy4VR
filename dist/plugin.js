@@ -1,6 +1,6 @@
 const __pluginConfig =  {
   "name": "windy-plugin-windy4vr",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "title": "Windy4VR",
   "icon": "🥕",
   "description": "Plugin windy pour visualiser son routage virtuel",
@@ -10,8 +10,8 @@ const __pluginConfig =  {
   "mobileUI": "small",
   "desktopWidth": 400,
   "routerPath": "/windy4vr",
-  "built": 1736010436924,
-  "builtReadable": "2025-01-04T17:07:16.924Z"
+  "built": 1736042781692,
+  "builtReadable": "2025-01-05T02:06:21.692Z"
 };
 
 // transformCode: import { map } from '@windy/map';
@@ -682,7 +682,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (822:0) {#if routes.length > 0}
+// (835:0) {#if routes.length > 0}
 function create_if_block_2(ctx) {
 	let h30;
 	let t1;
@@ -844,7 +844,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (842:4) {#if !isLoading}
+// (855:4) {#if !isLoading}
 function create_if_block_5(ctx) {
 	let t_value = /*windata*/ ctx[44].windSpeed + "";
 	let t;
@@ -867,7 +867,7 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (845:4) {#if !isLoading}
+// (858:4) {#if !isLoading}
 function create_if_block_4(ctx) {
 	let t0_value = /*windata*/ ctx[44].windDir + "";
 	let t0;
@@ -894,7 +894,7 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (848:4) {#if !isLoading}
+// (861:4) {#if !isLoading}
 function create_if_block_3(ctx) {
 	let t0_value = /*windata*/ ctx[44].TWA + "";
 	let t0;
@@ -921,7 +921,7 @@ function create_if_block_3(ctx) {
 	};
 }
 
-// (836:8) {#each windDatas as windata, index}
+// (849:8) {#each windDatas as windata, index}
 function create_each_block_1(ctx) {
 	let tr;
 	let td0;
@@ -1067,7 +1067,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (875:8) {#each closestWaypoints as closestWaypoint, index}
+// (888:8) {#each closestWaypoints as closestWaypoint, index}
 function create_each_block(ctx) {
 	let tr;
 	let td0;
@@ -1184,7 +1184,7 @@ function create_each_block(ctx) {
 	};
 }
 
-// (902:0) {#if !fileSelected}
+// (915:0) {#if !fileSelected}
 function create_if_block_1(ctx) {
 	let p;
 
@@ -1204,7 +1204,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (912:0) {:else}
+// (925:0) {:else}
 function create_else_block(ctx) {
 	let br0;
 	let t0;
@@ -1256,7 +1256,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (910:0) {#if !fileSelected}
+// (923:0) {#if !fileSelected}
 function create_if_block(ctx) {
 	let p;
 
@@ -1494,6 +1494,7 @@ function instance($$self, $$props, $$invalidate) {
 	let CSVformat = "";
 	let isShowZE = false;
 	let hue = 0;
+	let pluginListener = "";
 	const normal_icon = `<svg  viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path d="M4.784,13.635c0,0 -0.106,-2.924 0.006,-4.379c0.115,-1.502 0.318,-3.151 0.686,-4.632c0.163,-0.654 0.45,-1.623 0.755,-2.44c0.202,-0.54 0.407,-1.021 0.554,-1.352c0.038,-0.085 0.122,-0.139 0.215,-0.139c0.092,0 0.176,0.054 0.214,0.139c0.151,0.342 0.361,0.835 0.555,1.352c0.305,0.817 0.592,1.786 0.755,2.44c0.368,1.481 0.571,3.13 0.686,4.632c0.112,1.455 0.006,4.379 0.006,4.379l-4.432,0Z" style="fill:#000;"/><path d="M5.481,12.731c0,0 -0.073,-3.048 0.003,-4.22c0.06,-0.909 0.886,-3.522 1.293,-4.764c0.03,-0.098 0.121,-0.165 0.223,-0.165c0.103,0 0.193,0.067 0.224,0.164c0.406,1.243 1.232,3.856 1.292,4.765c0.076,1.172 0.003,4.22 0.003,4.22l-3.038,0Z" style="fill:#fff;fill-opacity:0.846008;"/></svg>`;
 
 	const carrot_icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-23.6626 -11.6643 10.13 31.78" width="12px" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
@@ -1707,10 +1708,8 @@ function instance($$self, $$props, $$invalidate) {
 
 	async function handleFileUpload(event) {
 		const files = Array.from(event.target.files);
-		$$invalidate(3, fileSelected = true);
-		files.length;
 
-		for (const file of files) {
+		const processingPromises = files.map(async file => {
 			if (filesList.indexOf(file.name) == -1) {
 				filesList.push(file.name);
 
@@ -1746,8 +1745,10 @@ function instance($$self, $$props, $$invalidate) {
 			} else {
 				alert(`Le fichier "${file.name}" est déjà présent.`);
 			}
-		}
+		});
 
+		await Promise.all(processingPromises);
+		$$invalidate(3, fileSelected = true);
 		plotGpsData();
 		const date = new Date(store.get("timestamp"));
 		syncMarkerWithForecast(date);
@@ -2206,10 +2207,17 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	onMount(() => {
-		
+		broadcast.emit('rqstClose', 'picker');
+
+		pluginListener = broadcast.on("pluginOpened", pluginName => {
+			if (pluginName == "picker") {
+				broadcast.emit('rqstClose', 'picker');
+			}
+		});
 	});
 
 	onDestroy(() => {
+		broadcast.off(pluginListener);
 		clearData();
 	});
 
